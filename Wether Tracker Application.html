@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Weather App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="box">
+        <h1>🌤️ Weather Tracker</h1>
+        <div class="search-area">
+            <input type="text" id="cityName" placeholder="Enter city name...">
+            <button id="searchBtn">Search</button>
+            <button id="locationBtn">📍 My Location</button>
+        </div>
+        <div id="message" class="message"></div>
+        <div id="weatherCard" class="weather-card">
+            <div class="city" id="city">--</div>
+            <div class="temp" id="temp">--°C</div>
+            <div class="weather" id="weather">--</div>
+            <div class="extra">
+                <span>💧 <span id="humidity">--</span>%</span>
+                <span>🌬️ <span id="wind">--</span> km/h</span>
+            </div>
+        </div>
+        <div class="note">📍 Type city name or use your location</div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
