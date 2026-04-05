@@ -174,4 +174,4 @@ cityInput.addEventListener('keypress', function(event) {
 });
 
 // Load default city when page opens
-getWeather('London');
+getWeather('Hyderabad');
