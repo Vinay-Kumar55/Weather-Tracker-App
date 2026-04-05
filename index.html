@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <title>My Weather App</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -13,7 +14,9 @@
         <div class="search-area">
             <input type="text" id="cityName" placeholder="Enter city name...">
             <button id="searchBtn">Search</button>
-            <button id="locationBtn">📍 My Location</button>
+            <button id="locationBtn">
+                <i class="bi bi-geo-alt-fill"></i> My Location
+            </button>
         </div>
         <div id="message" class="message"></div>
         <div id="weatherCard" class="weather-card">
