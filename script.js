@@ -12,22 +12,18 @@ let weatherTxt = document.getElementById('weather');
 let humidityTxt = document.getElementById('humidity');
 let windTxt = document.getElementById('wind');
 
-
 // message display
 function showMsg(text, type) {
     msg.style.display = 'block';
     msg.innerHTML = text;
     msg.className = 'message ' + type;
-
     setTimeout(() => {
         msg.style.display = 'none';
     }, 2500);
 }
 
-
 // main function
 async function getWeather(city) {
-
     if (!city) {
         showMsg('Enter city first!', 'error');
         return;
@@ -42,7 +38,7 @@ async function getWeather(city) {
         let geo = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}`);
         let geoJson = await geo.json();
 
-        if (!geoJson.results) {
+        if (!geoJson.results || geoJson.results.length === 0) {
             showMsg('City not found', 'error');
             return;
         }
@@ -51,18 +47,24 @@ async function getWeather(city) {
         let lat = data.latitude;
         let lon = data.longitude;
 
-        // get weather
+        // get weather with humidity
         let res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m`);
         let wData = await res.json();
 
-        let cur = wData.current_weather;
+        // FIX: Check if current_weather exists
+        if (!wData.current_weather) {
+            showMsg('Weather data error', 'error');
+            return;
+        }
 
+        let cur = wData.current_weather;
         let temp = cur.temperature;
         let wind = cur.windspeed;
         let code = cur.weathercode;
 
+        // FIX: Safely get humidity
         let humidity = '--';
-        if (wData.hourly && wData.hourly.relativehumidity_2m) {
+        if (wData.hourly && wData.hourly.relativehumidity_2m && wData.hourly.relativehumidity_2m.length > 0) {
             humidity = wData.hourly.relativehumidity_2m[0];
         }
 
@@ -76,29 +78,26 @@ async function getWeather(city) {
         msg.style.display = 'none';
 
     } catch (e) {
-        showMsg('Error getting data', 'error');
+        showMsg('Error getting data: ' + e.message, 'error');
         console.log(e);
     }
 }
 
-
 // weather text
 function getText(c) {
-    if (c == 0) return 'Clear';
-    if (c <= 2) return 'Cloudy';
-    if (c == 3) return 'Very Cloudy';
+    if (c == 0) return 'Clear Sky';
+    if (c == 1) return 'Mainly Clear';
+    if (c == 2) return 'Partly Cloudy';
+    if (c == 3) return 'Overcast';
     if (c >= 45 && c <= 48) return 'Fog';
     if (c >= 51 && c <= 67) return 'Rain';
     if (c >= 71 && c <= 77) return 'Snow';
-    if (c >= 95) return 'Storm';
-
-    return 'Normal';
+    if (c >= 95 && c <= 99) return 'Thunderstorm';
+    return 'Cloudy';
 }
-
 
 // location weather
 function getLocationWeather() {
-
     if (!navigator.geolocation) {
         showMsg('Location not supported', 'error');
         return;
@@ -108,7 +107,6 @@ function getLocationWeather() {
     card.style.display = 'none';
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
-
         let lat = pos.coords.latitude;
         let lon = pos.coords.longitude;
 
@@ -116,9 +114,13 @@ function getLocationWeather() {
             let res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
             let data = await res.json();
 
-            let cur = data.current_weather;
+            if (!data.current_weather) {
+                showMsg('Could not get weather for your location', 'error');
+                return;
+            }
 
-            cityTxt.innerHTML = 'Your Location';
+            let cur = data.current_weather;
+            cityTxt.innerHTML = '📍 Your Location';
             tempTxt.innerHTML = Math.round(cur.temperature) + '°C';
             weatherTxt.innerHTML = getText(cur.weathercode);
             humidityTxt.innerHTML = '--';
@@ -127,15 +129,13 @@ function getLocationWeather() {
             card.style.display = 'block';
             msg.style.display = 'none';
 
-        } catch {
+        } catch (error) {
             showMsg('Failed to load location weather', 'error');
         }
-
     }, () => {
-        showMsg('Allow location access', 'error');
+        showMsg('Please allow location access', 'error');
     });
 }
-
 
 // events
 btn.onclick = function () {
@@ -152,6 +152,5 @@ input.addEventListener('keypress', function (e) {
     }
 });
 
-
-// default
-getWeather('Delhi');
+// default - load a default city
+getWeather('New York');
