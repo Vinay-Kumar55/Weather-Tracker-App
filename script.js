@@ -154,4 +154,4 @@ input.addEventListener('keypress', function (e) {
 
 
 // default
-getWeather('Delhi');is this ai or human written code
+getWeather('Delhi');
