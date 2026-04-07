@@ -1,179 +1,157 @@
-// Get all HTML elements we need
-let cityInput = document.getElementById("cityName");
-let searchBtn = document.getElementById("searchBtn");
-let locationBtn = document.getElementById("locationBtn");
-let messageDiv = document.getElementById("message");
-let weatherCard = document.getElementById("weatherCard");
-let cityDisplay = document.getElementById("city");
-let tempDisplay = document.getElementById("temp");
-let weatherDisplay = document.getElementById("weather");
-let humidityDisplay = document.getElementById("humidity");
-let windDisplay = document.getElementById("wind");
+// getting elements
+let input = document.getElementById('cityName');
+let btn = document.getElementById('searchBtn');
+let locBtn = document.getElementById('locationBtn');
 
-// Show message function (error or loading)
-function showMessage(text, type) {
-    messageDiv.style.display = "block";
-    messageDiv.innerHTML = text;
-    messageDiv.className = "message " + type;
+let msg = document.getElementById('message');
+let card = document.getElementById('weatherCard');
 
-    // Hide message after 3 seconds if not loading
-    if (type !== "loading") {
-        setTimeout(() => {
-            messageDiv.style.display = "none";
-        }, 3000);
-    }
+let cityTxt = document.getElementById('city');
+let tempTxt = document.getElementById('temp');
+let weatherTxt = document.getElementById('weather');
+let humidityTxt = document.getElementById('humidity');
+let windTxt = document.getElementById('wind');
+
+
+// message display
+function showMsg(text, type) {
+    msg.style.display = 'block';
+    msg.innerHTML = text;
+    msg.className = 'message ' + type;
+
+    setTimeout(() => {
+        msg.style.display = 'none';
+    }, 2500);
 }
 
-// Hide message
-function hideMessage() {
-    messageDiv.style.display = "none";
-}
 
-// Get weather data from API
+// main function
 async function getWeather(city) {
-    if (city === "") {
-        showMessage("Please enter a city name", 'error');
+
+    if (!city) {
+        showMsg('Enter city first!', 'error');
         return;
     }
 
-    // Show loading
-    showMessage("Loading weather data...", "loading");
-    weatherCard.style.display = 'none';
+    msg.style.display = 'block';
+    msg.innerHTML = 'Loading...';
+    card.style.display = 'none';
 
     try {
-        // First get coordinates from city name
-        let geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${city}&count=1&language=en&format=json`;
-        let geoResponse = await fetch(geoUrl);
-        let geoData = await geoResponse.json();
+        // get coordinates
+        let geo = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${city}`);
+        let geoJson = await geo.json();
 
-        if (!geoData.results || geoData.results.length === 0) {
-            showMessage("City not found! Try another name", "error"); // ✅ Fixed: added missing )
+        if (!geoJson.results) {
+            showMsg('City not found', 'error');
             return;
         }
 
-        let lat = geoData.results[0].latitude;
-        let lon = geoData.results[0].longitude;
-        let realCityName = geoData.results[0].name;
-        let country = geoData.results[0].country;
+        let data = geoJson.results[0];
+        let lat = data.latitude;
+        let lon = data.longitude;
 
-        // Now get weather data - ✅ Fixed: changed " to `
-        let weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m&timezone=auto`;
-        let weatherResponse = await fetch(weatherUrl);
-        let weatherData = await weatherResponse.json();
+        // get weather
+        let res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m`);
+        let wData = await res.json();
 
-        let current = weatherData.current_weather;
-        let temp = current.temperature;
-        let wind = current.windspeed;
-        let weatherCode = current.weathercode;
+        let cur = wData.current_weather;
 
-        // Get humidity from hourly data
-        let humidity = "--";
-        if (weatherData.hourly && weatherData.hourly.relativehumidity_2m) {
-            humidity = weatherData.hourly.relativehumidity_2m[0];
+        let temp = cur.temperature;
+        let wind = cur.windspeed;
+        let code = cur.weathercode;
+
+        let humidity = '--';
+        if (wData.hourly && wData.hourly.relativehumidity_2m) {
+            humidity = wData.hourly.relativehumidity_2m[0];
         }
 
-        // Convert weather code to text
-        let weatherText = getWeatherText(weatherCode);
+        cityTxt.innerHTML = data.name + ', ' + data.country;
+        tempTxt.innerHTML = Math.round(temp) + '°C';
+        weatherTxt.innerHTML = getText(code);
+        humidityTxt.innerHTML = humidity;
+        windTxt.innerHTML = Math.round(wind);
 
-        // Show weather card with data
-        cityDisplay.innerHTML = realCityName + ", " + country;
-        tempDisplay.innerHTML = Math.round(temp) + "°C";
-        weatherDisplay.innerHTML = weatherText;
-        humidityDisplay.innerHTML = humidity;
-        windDisplay.innerHTML = Math.round(wind);
+        card.style.display = 'block';
+        msg.style.display = 'none';
 
-        weatherCard.style.display = "block";
-        hideMessage();
-
-    } catch (error) {
-        showMessage("Something went wrong! Try again", "error");
-        console.log(error);
+    } catch (e) {
+        showMsg('Error getting data', 'error');
+        console.log(e);
     }
 }
 
-// Convert weather code to simple text
-function getWeatherText(code) {
-    if (code === 0) return "☀️ Clear Sky";
-    if (code === 1 || code === 2) return "⛅ Partly Cloudy";
-    if (code === 3) return '☁️ Cloudy';
-    if (code >= 45 && code <= 48) return "🌫️ Foggy";
-    if (code >= 51 && code <= 67) return "🌧️ Rainy";
-    if (code >= 71 && code <= 77) return "❄️ Snowy";
-    if (code >= 80 && code <= 82) return "🌧️ Rain Showers";
-    if (code >= 95 && code <= 99) return "⛈️ Thunderstorm";
-    return "🌤️ Normal";
+
+// weather text
+function getText(c) {
+    if (c == 0) return 'Clear';
+    if (c <= 2) return 'Cloudy';
+    if (c == 3) return 'Very Cloudy';
+    if (c >= 45 && c <= 48) return 'Fog';
+    if (c >= 51 && c <= 67) return 'Rain';
+    if (c >= 71 && c <= 77) return 'Snow';
+    if (c >= 95) return 'Storm';
+
+    return 'Normal';
 }
 
-// Get weather using user's current location
+
+// location weather
 function getLocationWeather() {
+
     if (!navigator.geolocation) {
-        showMessage("Your browser does not support location", "error");
+        showMsg('Location not supported', 'error');
         return;
     }
 
-    showMessage("Getting your location...", "loading");
-    weatherCard.style.display = "none";
+    showMsg('Getting location...', 'loading');
+    card.style.display = 'none';
 
-    navigator.geolocation.getCurrentPosition(async function(position) {
-            let lat = position.coords.latitude;
-            let lon = position.coords.longitude;
+    navigator.geolocation.getCurrentPosition(async (pos) => {
 
-            try {
-                // ✅ Fixed: changed " to `
-                let weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m&timezone=auto`;
-                let weatherResponse = await fetch(weatherUrl);
-                let weatherData = await weatherResponse.json();
+        let lat = pos.coords.latitude;
+        let lon = pos.coords.longitude;
 
-                let current = weatherData.current_weather;
-                let temp = current.temperature;
-                let wind = current.windspeed;
-                let weatherCode = current.weathercode;
+        try {
+            let res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+            let data = await res.json();
 
-                let humidity = "--";
-                if (weatherData.hourly && weatherData.hourly.relativehumidity_2m) {
-                    humidity = weatherData.hourly.relativehumidity_2m[0];
-                }
+            let cur = data.current_weather;
 
-                let weatherText = getWeatherText(weatherCode);
+            cityTxt.innerHTML = 'Your Location';
+            tempTxt.innerHTML = Math.round(cur.temperature) + '°C';
+            weatherTxt.innerHTML = getText(cur.weathercode);
+            humidityTxt.innerHTML = '--';
+            windTxt.innerHTML = Math.round(cur.windspeed);
 
-                cityDisplay.innerHTML = "📍 Your Location";
-                // ✅ Fixed: changed " to `
-                tempDisplay.innerHTML = `${Math.round(temp)}°C`;
-                weatherDisplay.innerHTML = weatherText;
-                humidityDisplay.innerHTML = humidity;
-                windDisplay.innerHTML = Math.round(wind);
+            card.style.display = 'block';
+            msg.style.display = 'none';
 
-                weatherCard.style.display = "block";
-                hideMessage();
+        } catch {
+            showMsg('Failed to load location weather', 'error');
+        }
 
-            } catch (error) {
-                showMessage("Could not get weather for your location", "error");
-            }
-        },
-        function(error) {
-            if (error.code === 1) {
-                showMessage("Please allow location access", "error");
-            } else {
-                showMessage("Could not get your location", "error");
-            }
-        });
+    }, () => {
+        showMsg('Allow location access', 'error');
+    });
 }
 
-// Button click events
-searchBtn.addEventListener("click", function() {
-    getWeather(cityInput.value);
-});
 
-locationBtn.addEventListener("click", function() {
+// events
+btn.onclick = function () {
+    getWeather(input.value);
+};
+
+locBtn.onclick = function () {
     getLocationWeather();
-});
+};
 
-// Press Enter key to search
-cityInput.addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        getWeather(cityInput.value);
+input.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        getWeather(input.value);
     }
 });
 
-// Load default city when page opens
-getWeather("Hyderabad");
+
+// default
+getWeather('Delhi');is this ai or human written code
