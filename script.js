@@ -57,7 +57,7 @@ async function getWeather(city) {
         let country = geoData.results[0].country;
 
         // Now get weather data
-        let weatherUrl = "https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m&timezone=auto";
+        let weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m&timezone=auto`;
         let weatherResponse = await fetch(weatherUrl);
         let weatherData = await weatherResponse.json();
 
