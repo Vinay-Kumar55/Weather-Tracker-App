@@ -47,7 +47,7 @@ async function getWeather(city) {
         let geoData = await geoResponse.json();
 
         if (!geoData.results || geoData.results.length === 0) {
-            showMessage("City not found! Try another name", "error";
+            showMessage("City not found! Try another name", "error"); // ✅ Fixed: added missing )
             return;
         }
 
@@ -56,7 +56,7 @@ async function getWeather(city) {
         let realCityName = geoData.results[0].name;
         let country = geoData.results[0].country;
 
-        // Now get weather data
+        // Now get weather data - ✅ Fixed: changed " to `
         let weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m&timezone=auto`;
         let weatherResponse = await fetch(weatherUrl);
         let weatherData = await weatherResponse.json();
@@ -119,7 +119,8 @@ function getLocationWeather() {
             let lon = position.coords.longitude;
 
             try {
-                let weatherUrl = "https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m&timezone=auto";
+                // ✅ Fixed: changed " to `
+                let weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m&timezone=auto`;
                 let weatherResponse = await fetch(weatherUrl);
                 let weatherData = await weatherResponse.json();
 
@@ -136,7 +137,8 @@ function getLocationWeather() {
                 let weatherText = getWeatherText(weatherCode);
 
                 cityDisplay.innerHTML = "📍 Your Location";
-                tempDisplay.innerHTML = "${Math.round(temp)}°C";
+                // ✅ Fixed: changed " to `
+                tempDisplay.innerHTML = `${Math.round(temp)}°C`;
                 weatherDisplay.innerHTML = weatherText;
                 humidityDisplay.innerHTML = humidity;
                 windDisplay.innerHTML = Math.round(wind);
