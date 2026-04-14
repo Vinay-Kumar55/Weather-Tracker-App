@@ -6,21 +6,20 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-
-<div class="container">
-    <h1><i class="fa-solid fa-cloud-sun"></i> Weather App</h1>
-
-    <div class="search-box">
-        <input type="text" id="city" placeholder="Enter city name">
-        <br>
-        <button class="locationButton" onclick="getLocation()">📍 Location</button>
-        <button class="searchButton" onclick="getWeather()">Search</button>
+    <div class="container">
+        <h1><i class="fa-solid fa-cloud-sun"></i> Weather App</h1>
+    
+        <div class="search-box">
+            <input type="text" id="city" placeholder="Enter city name">
+            <br>
+            <button class="locationButton" onclick="getLocation()">📍 Location</button>
+            <button class="searchButton" onclick="getWeather()">Search</button>
+        </div>
+    
+        <div id="weather" class="weather-card">
+            <p>Search weather to see details</p>
+        </div>
     </div>
-
-    <div id="weather" class="weather-card">
-    <p>Search weather to see details</p>
-</div>
-</div>
 
 <script src="script.js"></script>
 </body>
