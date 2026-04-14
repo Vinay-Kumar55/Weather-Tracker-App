@@ -1,6 +1,5 @@
-const apiKey = "e616a721f2021313b3441b18d78fb42c"; // ⚠️ put your real key here
+const apiKey = "e616a721f2021313b3441b18d78fb42c"; 
 
-// Load last searched city
 window.onload = function () {
     let savedCity = localStorage.getItem("city");
     if (savedCity) {
@@ -8,7 +7,6 @@ window.onload = function () {
     }
 };
 
-// Get weather by city
 function getWeather(cityInput) {
 
     let city = cityInput || document.getElementById("city").value.trim();
@@ -18,7 +16,6 @@ function getWeather(cityInput) {
         return;
     }
 
-    // Show loading
     document.getElementById("weather").innerHTML = "Loading...";
 
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
@@ -26,7 +23,6 @@ function getWeather(cityInput) {
         .then(data => {
             console.log(data);
 
-            // ❌ Handle error properly
             if (data.cod !== 200) {
                 document.getElementById("weather").innerHTML = "❌ " + data.message;
                 return;
@@ -34,7 +30,6 @@ function getWeather(cityInput) {
 
             displayData(data);
 
-            // ✅ Save city
             localStorage.setItem("city", city);
         })
         .catch(() => {
@@ -42,7 +37,6 @@ function getWeather(cityInput) {
         });
 }
 
-// Get weather by location
 function getLocation() {
 
     document.getElementById("weather").innerHTML = "Getting location...";
@@ -72,24 +66,19 @@ function getLocation() {
     });
 }
 
-// Display data
 function displayData(data) {
 
-    // ✅ Safety check
     if (!data.main || !data.weather) {
         document.getElementById("weather").innerHTML = "No data available";
         return;
     }
 
-    // Weather icon
     let iconCode = data.weather[0].icon;
     let iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
 
     let temp = Math.round(data.main.temp);
 
-    document.getElementById("weather").innerHTML = `
-    <h2>${data.name}</h2>
-
+    document.getElementById("weather").innerHTML = `<h2>${data.name}</h2>
     <img src="${iconUrl}" alt="weather icon"
          onerror="this.style.display='none'; this.nextElementSibling.style.display='block'" />
 
