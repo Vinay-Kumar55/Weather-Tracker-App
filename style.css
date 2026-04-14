@@ -2,16 +2,12 @@ body {
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman';
     margin: 0;
     height: 100vh;
-
-    /* 🌈 Gradient Background */
     background: linear-gradient(135deg, #ff7e5f, #feb47b, #6a11cb, #2575fc);
     background-size: 400% 400%;
     animation: gradientBG 10s ease infinite;
-
     color: white;
 }
 
-/* Background animation */
 @keyframes gradientBG {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -28,7 +24,6 @@ h1 {
     letter-spacing: 1px;
 }
 
-/* 🔍 Search box */
 .search-box input {
     padding: 12px;
     width: 260px;
@@ -54,18 +49,13 @@ h1 {
     transform: scale(1.05);
 }
 
-/* 🌟 Weather Card */
 .weather-card {
     width: 320px;
     margin: 40px auto;
     padding: 25px;
     border-radius: 20px;
-
-    /* ✅ Solid contrast color */
-    background: #120707;   /* dark blue */
-
+    background: #120707;
     color: white;
-
     box-shadow: 0 10px 25px rgba(0,0,0,0.4);
     transition: 0.3s;
 }
@@ -74,7 +64,6 @@ h1 {
     transform: translateY(-5px);
 }
 
-/* Temperature */
 .weather-card h2 {
     font-size: 28px;
 }
@@ -92,7 +81,6 @@ h1 {
     font-weight: bold;
 }
 
-/* Extra details */
 .extra {
     margin-top: 15px;
     font-size: 16px;
