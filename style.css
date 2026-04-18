@@ -54,10 +54,8 @@ h1 {
     margin: 40px auto;
     padding: 25px;
     border-radius: 20px;
-
     background: #120707;
     color: white;
-
     box-shadow: 0 10px 25px rgba(0,0,0,0.4);
     transition: 0.3s;
 }
