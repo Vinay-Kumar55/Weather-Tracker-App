@@ -1,5 +1,8 @@
 const apiKey = "e616a721f2021313b3441b18d78fb42c";
 
+const cityInputEl = document.getElementById("city");
+const weatherEl = document.getElementById("weather");
+
 window.onload = function () {
     let savedCity = localStorage.getItem("city");
     if (savedCity) {
@@ -8,14 +11,14 @@ window.onload = function () {
 };
 
 function getWeather(cityInput) {
-    let city = cityInput || document.getElementById("city").value.trim();
+    let city = cityInput || cityInputEl.value.trim();
 
     if (city === "") {
         alert("Please enter city name");
         return;
     }
 
-    document.getElementById("weather").innerHTML = "Loading...";
+    weatherEl.innerHTML = "Loading...";
 
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
         .then(res => res.json())
@@ -23,7 +26,7 @@ function getWeather(cityInput) {
             console.log(data);
 
             if (data.cod !== 200) {
-                document.getElementById("weather").innerHTML = "❌ " + data.message;
+                weatherEl.innerHTML = "❌ " + data.message;
                 return;
             }
 
@@ -31,12 +34,12 @@ function getWeather(cityInput) {
             localStorage.setItem("city", city);
         })
         .catch(() => {
-            document.getElementById("weather").innerHTML = "Error fetching data";
+            weatherEl.innerHTML = "Error fetching data";
         });
 }
 
 function getLocation() {
-    document.getElementById("weather").innerHTML = "Getting location...";
+    weatherEl.innerHTML = "Getting location...";
 
     navigator.geolocation.getCurrentPosition(position => {
         let lat = position.coords.latitude;
@@ -46,24 +49,24 @@ function getLocation() {
             .then(res => res.json())
             .then(data => {
                 if (data.cod !== 200) {
-                    document.getElementById("weather").innerHTML = "❌ " + data.message;
+                    weatherEl.innerHTML = "❌ " + data.message;
                     return;
                 }
 
                 displayData(data);
             })
             .catch(() => {
-                document.getElementById("weather").innerHTML = "Error fetching location weather";
+                weatherEl.innerHTML = "Error fetching location weather";
             });
 
     }, () => {
-        document.getElementById("weather").innerHTML = "Location access denied";
+        weatherEl.innerHTML = "Location access denied";
     });
 }
 
 function displayData(data) {
     if (!data.main || !data.weather) {
-        document.getElementById("weather").innerHTML = "No data available";
+        weatherEl.innerHTML = "No data available";
         return;
     }
 
@@ -71,7 +74,7 @@ function displayData(data) {
     let iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
     let temp = Math.round(data.main.temp);
 
-    document.getElementById("weather").innerHTML = `
+    weatherEl.innerHTML = `
     <h2>${data.name}</h2>
 
     <img src="${iconUrl}" alt="weather icon"
