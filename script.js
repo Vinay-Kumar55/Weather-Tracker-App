@@ -77,9 +77,10 @@ function displayData(data) {
     weatherEl.innerHTML = `
     <h2>${data.name}</h2>
 
-    <img src="${iconUrl}" alt="weather icon"
-         onerror="this.style.display='none'; this.nextElementSibling.style.display='block'" />
-
+    img.onerror = function () {
+    img.src = "";
+    img.alt = "☁️";
+};
     <p style="display:none; font-size:40px;">☁️</p>
 
     <p style="font-size:30px;">🌡️ ${temp}°C</p>
