@@ -38,23 +38,38 @@ async function getWeather(cityInput) {
 async function getLocation() {
     weatherEl.innerHTML = "Getting location...";
 
-    try {
-        let position = await getCurrentPositionPromise();
-        let lat = position.coords.latitude;
-        let lon = position.coords.longitude;
-        let res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);
-        let data = await res.json();
-
-        if (data.cod !== 200) {
-            weatherEl.innerHTML = "❌ " + data.message;
-            return;
-        }
-
-        displayData(data);
-
-    } catch (error) {
-        weatherEl.innerHTML = "Location access denied or error fetching weather";
+    if (!navigator.geolocation) {
+        weatherEl.innerHTML = "Geolocation is not supported by your browser";
+        return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+        async function (position) {
+            try {
+                let lat = position.coords.latitude;
+                let lon = position.coords.longitude;
+
+                let res = await fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+                );
+
+                let data = await res.json();
+
+                if (data.cod != 200) {
+                    weatherEl.innerHTML = "❌ " + data.message;
+                    return;
+                }
+
+                displayData(data);
+
+            } catch (error) {
+                weatherEl.innerHTML = "Error fetching weather data";
+            }
+        },
+        function (error) {
+            weatherEl.innerHTML = "Location access denied ❌";
+        }
+    );
 }
 
 function displayData(data) {
