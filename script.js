@@ -34,42 +34,40 @@ async function getWeather(cityInput) {
     } catch (error) {
         weatherEl.innerHTML = "Error fetching data";
     }
+function getCurrentPositionPromise() {
+    return new Promise(function(resolve, reject) {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
 }
+
 async function getLocation() {
+
     weatherEl.innerHTML = "Getting location...";
 
-    if (!navigator.geolocation) {
-        weatherEl.innerHTML = "Geolocation is not supported by your browser";
-        return;
-    }
+    try {
+        // Get location
+        let position = await getCurrentPositionPromise();
 
-    navigator.geolocation.getCurrentPosition(
-        async function (position) {
-            try {
-                let lat = position.coords.latitude;
-                let lon = position.coords.longitude;
+        let lat = position.coords.latitude;
+        let lon = position.coords.longitude;
 
-                let res = await fetch(
-                    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
-                );
+        // Fetch weather
+        let res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);
+        let data = await res.json();
 
-                let data = await res.json();
+        console.log(data);
 
-                if (data.cod != 200) {
-                    weatherEl.innerHTML = "❌ " + data.message;
-                    return;
-                }
-
-                displayData(data);
-
-            } catch (error) {
-                weatherEl.innerHTML = "Error fetching weather data";
-            }
-        },
-        function (error) {
-            weatherEl.innerHTML = "Location access denied ❌";
+        if (data.cod !== 200) {
+            weatherEl.innerHTML = "❌ " + data.message;
+            return;
         }
-    );
+
+        displayData(data);
+
+    } catch (error) {
+        weatherEl.innerHTML = "Location access denied or error fetching weather";
+    }
+}
 }
 
 function displayData(data) {
