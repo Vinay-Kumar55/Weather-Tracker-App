@@ -45,13 +45,10 @@ async function getLocation() {
     weatherEl.innerHTML = "Getting location...";
 
     try {
-        // Get location
         let position = await getCurrentPositionPromise();
 
         let lat = position.coords.latitude;
         let lon = position.coords.longitude;
-
-        // Fetch weather
         let res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);
         let data = await res.json();
 
