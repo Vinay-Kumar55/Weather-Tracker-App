@@ -11,16 +11,12 @@ window.onload = function () {
 };
 
 async function getWeather(cityInput) {
-
     let city = cityInput || cityInputEl.value.trim();
-
     if (city === "") {
         alert("Please enter city name");
         return;
     }
-
     weatherEl.innerHTML = "Loading...";
-
     try {
         let res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
         let data = await res.json();
@@ -44,7 +40,6 @@ async function getLocation() {
 
     try {
         let position = await getCurrentPositionPromise();
-
         let lat = position.coords.latitude;
         let lon = position.coords.longitude;
         let res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);
