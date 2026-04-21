@@ -10,7 +10,8 @@ window.onload = function () {
     }
 };
 
-function getWeather(cityInput) {
+async function getWeather(cityInput) {
+
     let city = cityInput || cityInputEl.value.trim();
 
     if (city === "") {
@@ -20,48 +21,45 @@ function getWeather(cityInput) {
 
     weatherEl.innerHTML = "Loading...";
 
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
+    try {
+        let res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+        let data = await res.json();
 
-            if (data.cod !== 200) {
-                weatherEl.innerHTML = "❌ " + data.message;
-                return;
-            }
+        console.log(data);
 
-            displayData(data);
-            localStorage.setItem("city", city);
-        })
-        .catch(() => {
-            weatherEl.innerHTML = "Error fetching data";
-        });
+        if (data.cod !== 200) {
+            weatherEl.innerHTML = "❌ " + data.message;
+            return;
+        }
+
+        displayData(data);
+        localStorage.setItem("city", city);
+
+    } catch (error) {
+        weatherEl.innerHTML = "Error fetching data";
+    }
 }
-
-function getLocation() {
+async function getLocation() {
     weatherEl.innerHTML = "Getting location...";
 
-    navigator.geolocation.getCurrentPosition(position => {
+    try {
+        let position = await getCurrentPositionPromise();
+
         let lat = position.coords.latitude;
         let lon = position.coords.longitude;
+        let res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);
+        let data = await res.json();
 
-        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.cod !== 200) {
-                    weatherEl.innerHTML = "❌ " + data.message;
-                    return;
-                }
+        if (data.cod !== 200) {
+            weatherEl.innerHTML = "❌ " + data.message;
+            return;
+        }
 
-                displayData(data);
-            })
-            .catch(() => {
-                weatherEl.innerHTML = "Error fetching location weather";
-            });
+        displayData(data);
 
-    }, () => {
-        weatherEl.innerHTML = "Location access denied";
-    });
+    } catch (error) {
+        weatherEl.innerHTML = "Location access denied or error fetching weather";
+    }
 }
 
 function displayData(data) {
